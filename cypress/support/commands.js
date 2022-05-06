@@ -24,7 +24,7 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
-// Will be used with an API method
+// These two commands will be used with an API method
 Cypress.Commands.add('loginWithCredentials', (email, password)=> {
     cy.get('#id_username').type(email)
     cy.get('#id_password').type(password)
@@ -32,16 +32,6 @@ Cypress.Commands.add('loginWithCredentials', (email, password)=> {
 })
 
 
-// Must convert these two commands in functions
-Cypress.Commands.add('accessToArticleByName', (name)=>{
-    cy.get('a > h1').contains(name).click()
-})
-
-Cypress.Commands.add('accessToArticleByIndex', (index) => {
-    cy.get('.preview-link > a').eq(index).click()
-})
-
-// These two commands will be used with an API method
 Cypress.Commands.add('createArticle', (title, description, body, tags)=>{
     cy.contains('New Article').click()
     cy.get('#id_title').type(title)
@@ -52,8 +42,30 @@ Cypress.Commands.add('createArticle', (title, description, body, tags)=>{
     cy.visit('/')
 })
 
-Cypress.Commands.add('deleteLastCreatedArticle', ()=>{
+
+Cypress.Commands.add('deleteArticle', () => {
+    // There is not exist any option or button to delete an article, this method is executed via request
+    // The only way I found to delete an article is by setting two cookies before executing the method
+
+    cy.setCookie('csrftoken', 'Zpe3934sqarqMFa1fh1dvGn994woCikLEJDQniA6ohUsHdCVlX2yjemJ43Ujskob')
+    cy.setCookie('sessionid', 'zf4o9xkownkqpvunmecwf789el6war7d')
+    cy.get('.article-preview > a').invoke('attr', 'href').then((attr) => {
+        // The id from the article is extracted so it can be used in the DELETE method
+        console.log(attr)
+
+        const splitUrl = attr.split('/')
+        console.log(splitUrl)
+        cy.log(`Removing article with id: ${splitUrl[2]}`)
+        cy.request({
+            method: 'DELETE',
+            url: `/article/delete/${splitUrl[2]}/`,
+            headers: { 'X-CSRFToken': 'Zpe3934sqarqMFa1fh1dvGn994woCikLEJDQniA6ohUsHdCVlX2yjemJ43Ujskob' }
+        }).should((response) => {
+            expect(response.status).to.eq(200)
+        })
+    })
     cy.visit('/')
-    cy.accessToArticleByIndex(0)
-    cy.contains('Delete Article').click()
 })
+
+
+// TODO Create a command for user creation

@@ -1,14 +1,26 @@
 /// <reference types="cypress" />
 
 xdescribe('Visitors actions', ()=>{
+    it('should be able to see global feed', () => {
 
+    })
 })
 
-describe('Logged users actions', () => {
+xdescribe('Logged users actions', () => {
 
     beforeEach(() => cy.visit("/login"))
 
-    it('should be able to like an Article', () =>{
+
+    it('should be able to see my feed', () => {
+
+    })
+
+    it('should be able to see global feed', () => {
+
+    })
+
+    // TODO Verify this test
+    it('should be able to like an Article with a different user', () =>{
         cy.loginWithCredentials("like@test.com", "Test1234")
         cy.contains('automation').should('be.visible')
         cy.get('.preview-link > a').eq(0).click()
@@ -65,6 +77,24 @@ describe('Logged users actions', () => {
                 }
             })
         })
+    })
+
+    it('should be able to delete an article', ()=>{
+
+        // This test deletes an article and verify that the same article does not exist
+        // Use this test only when there is articles in the list
+        // TODO Add a way to handle when there is not articles
+        cy.get('a > h1').eq(0).then(($element)=>{
+            const articleTitle = $element.text()
+            cy.deleteArticle()
+            cy.contains(articleTitle).should('not.exist')
+        })
+        
+    })
+
+
+    it('should be able to filter by tag', () => {
+
     })
 
 })

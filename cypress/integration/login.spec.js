@@ -28,7 +28,7 @@ describe('Successful Login actions', () => {
 
     beforeEach(() => cy.visit("/login"))
 
-    it('should logging with correct credentials', () => {
+    it.only('should logging with correct credentials', () => {
         cy.loginWithCredentials("automation@test.com", "Test1234")
         cy.contains('Sign Out').should('be.visible')
     })
