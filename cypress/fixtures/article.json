@@ -1,6 +1,6 @@
 {
     "title": "New Article ",
-    "description": "This is an automated article",
-    "body": "# Hello World",
+    "summary": "This is an automated article",
+    "content": "# Hello World",
     "tags": "test"
 }

@@ -1,100 +1,85 @@
 /// <reference types="cypress" />
 
-xdescribe('Visitors actions', ()=>{
-    it('should be able to see global feed', () => {
+describe('Logged users actions', () => {
 
-    })
-})
+    beforeEach(() => {
 
-xdescribe('Logged users actions', () => {
-
-    beforeEach(() => cy.visit("/login"))
-
-
-    it('should be able to see my feed', () => {
-
-    })
-
-    it('should be able to see global feed', () => {
-
-    })
-
-    // TODO Verify this test
-    it('should be able to like an Article with a different user', () =>{
-        cy.loginWithCredentials("like@test.com", "Test1234")
-        cy.contains('automation').should('be.visible')
-        cy.get('.preview-link > a').eq(0).click()
-        cy.contains('Favorite Article').click()
-        cy.intercept({
-            method: 'POST',
-            url:'/article/2/new-article-1651693350372/'
-        }).as('getArticleInformation')
-        cy.wait('@getArticleInformation')
-        cy.get('.counter').each((item)=>{
-            cy.wrap(item).should('have.text', '(1)')
-        })
-    }) 
-
-
-
-    // There is not delete button on this website
-    xit('should be able to verify if the count of articles decreases when an article is deleted', ()=>{
+        // The user will be logged in before each test
+        cy.visit('/login')
         cy.loginWithCredentials("automation@test.com", "Test1234")
-        // If there are not articles, at least one needs to be created so it can be deleted
-        cy.get('.article-preview').then((preview)=>{
-            if(preview.text().includes("No articles are here")){
-                cy.createArticle(title, description, body, tags)
-                cy.visit('/')
-            }
-        })
-        // This instructions will delete the article
-        // The lenght of the list will be obtained
-        cy.get('.article-preview').its('length').then((oldLenght) => {
-            // Then the first article will be deleted
-            cy.accessToArticleByIndex(0)
-            cy.contains('Delete Article').click()
-
-            // Then a new lenght needs to be obtained
-            cy.get('.article-preview').its('length').then((actualLenght)=>{
-
-                // But the fronted displays a text "No articles are here" in the same class .article-preview
-                if (actualLenght == 1){
-
-                    // And it counts in the list, so is a false positive, instead to bypass this
-                    cy.get('.article-preview').then((preview)=>{
-
-                        // If there is at least 1 element of .article-preview, we verify if it is actually the message
-                        if(preview.text().includes("No articles are here")){
-
-                            // And if it is, we just verify that another element present in the article is not present
-                            cy.get('.preview-link').should('not.exist')
-                        }
-                    })
-                }
-                else{
-                    // If there is not message present, it is because there are articles in the list, so we verify the old length againt the new length
-                    expect(actualLenght).to.be.below(oldLenght)
-                }
-            })
-        })
-    })
-
-    it('should be able to delete an article', ()=>{
-
-        // This test deletes an article and verify that the same article does not exist
-        // Use this test only when there is articles in the list
-        // TODO Add a way to handle when there is not articles
-        cy.get('a > h1').eq(0).then(($element)=>{
-            const articleTitle = $element.text()
-            cy.deleteArticle()
-            cy.contains(articleTitle).should('not.exist')
-        })
+        cy.contains('Sign Out').should('be.visible')
         
     })
 
 
-    it('should be able to filter by tag', () => {
+    it('should be able to see my feed', () => {
+        cy.contains('Your Feed').click()
+        cy.get('.author').each(($el) => {
+            cy.wrap($el).should('have.text','automation')
+        })
+    })
 
+
+    it('should be able to like an Article with a different user', () =>{
+        // This test allows to create a new article and then like with another user
+
+        cy.addArticle()
+        // Cookies and storage is deleted, then the log in is performed with the user like
+        cy.clearCookies()
+        cy.clearLocalStorage()
+        cy.visit('/login')
+        cy.loginWithCredentials("like@test.com", "Test1234")
+        cy.contains('Sign Out').should('be.visible')
+
+        // Intercept the POST request after clicking like to wait until it is finished
+        cy.intercept('POST','/article/favorite/**').as('favoriteArticle')
+
+        // Press like button on created article and check again that it has the class btn-outline-secondary
+        cy.get('.article-meta button').eq(0).click()
+        cy.wait('@favoriteArticle', { timeout: 10000 } )
+        cy.get('.article-meta button').eq(0).should('have.class', 'btn-outline-secondary')
+
+        cy.get('.article-meta button').eq(0).then((item) => {
+            cy.wrap(item).should('contain.text', '1')
+        })
+        
+    }) 
+
+
+    it('should be able to verify if the count of articles decreases when an article is deleted', ()=>{
+        
+        cy.addArticle().as('createdArticle')
+        cy.visit('/')
+
+
+        // The lenght of the list will be obtained
+        cy.get('.article-preview').its('length').then((oldLenght) => {
+            // Then the first article will be deleted
+            cy.deleteArticle()
+
+            // Then a new lenght needs to be obtained
+            cy.get('.article-preview').its('length').then((actualLenght)=>{
+
+                expect(actualLenght).to.be.below(oldLenght)
+
+                // Verify if the created article is not displayed on the list
+                cy.get('@createdArticle').then((response) => {
+                    const pathSplit = response.headers['hx-redirect'].split("/")
+                    const title = pathSplit[3].replaceAll("-", " ")
+                    cy.contains(title).should('not.exist')
+                })
+            })
+        })
+    })
+
+
+    it('should be able to filter by tag', () => {
+        cy.addArticle("newTag")
+        cy.visit('/')
+        cy.get('.sidebar').contains('newTag').click()
+        cy.get('.tag-outline').each(($elem)=>{
+            cy.wrap($elem).should('have.text','newTag')
+        })
     })
 
 })

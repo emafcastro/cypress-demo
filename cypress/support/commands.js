@@ -24,7 +24,7 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
-// These two commands will be used with an API method
+// TODO This command will be used with an API method
 Cypress.Commands.add('loginWithCredentials', (email, password)=> {
     cy.get('#id_username').type(email)
     cy.get('#id_password').type(password)
@@ -32,24 +32,14 @@ Cypress.Commands.add('loginWithCredentials', (email, password)=> {
 })
 
 
-Cypress.Commands.add('createArticle', (title, description, body, tags)=>{
-    cy.contains('New Article').click()
-    cy.get('#id_title').type(title)
-    cy.get('#id_summary').type(description)
-    cy.get('#id_content').type(body)
-    cy.get('[name=tags]').type(tags)
-    cy.contains('Publish Article').click()
-    cy.visit('/')
-})
-
 
 Cypress.Commands.add('deleteArticle', () => {
-    // There is not exist any option or button to delete an article, this method is executed via request
+    // Delete article option does not exist on the webist, so this method is executed via request
     // The only way I found to delete an article is by setting two cookies before executing the method
 
     cy.setCookie('csrftoken', 'Zpe3934sqarqMFa1fh1dvGn994woCikLEJDQniA6ohUsHdCVlX2yjemJ43Ujskob')
     cy.setCookie('sessionid', 'zf4o9xkownkqpvunmecwf789el6war7d')
-    cy.get('.article-preview > a').invoke('attr', 'href').then((attr) => {
+    cy.get('.article-preview > a').eq(0).invoke('attr', 'href').then((attr) => {
         // The id from the article is extracted so it can be used in the DELETE method
         console.log(attr)
 
@@ -67,5 +57,60 @@ Cypress.Commands.add('deleteArticle', () => {
     cy.visit('/')
 })
 
+Cypress.Commands.add('addArticle', (tags) => {
+    // TODO Investigate about adding an article with more than one tag
+    const title = "New Article " + Date.now()
+    const description = "This is an article created by API"
+    const body = "# Hello World"
+
+    if (tags == undefined) {
+        tags = "test"
+    }
+
+    cy.setCookie('csrftoken', 'Zpe3934sqarqMFa1fh1dvGn994woCikLEJDQniA6ohUsHdCVlX2yjemJ43Ujskob')
+    cy.setCookie('sessionid', 'zf4o9xkownkqpvunmecwf789el6war7d')
+
+    cy.request({
+        method: 'POST',
+        url: '/new/',
+        body: {
+            "title": title,
+            "summary": description,
+            "content": body,
+            "tags": tags
+        },
+        form: true,
+        headers: {
+            'X-CSRFToken': 'Zpe3934sqarqMFa1fh1dvGn994woCikLEJDQniA6ohUsHdCVlX2yjemJ43Ujskob',
+            'Content-Type': "multipart/form-data; boundary=--------------------------579482458443764609045166"
+        }
+    })
+})
+
+Cypress.Commands.add('addComment', ()=> {
+    // This command allows to add a comment on a created article
+    cy.get('@createdArticle').then((response) => {
+        const pathSplit = response.headers['hx-redirect'].split("/")
+        
+        cy.setCookie('csrftoken', 'Zpe3934sqarqMFa1fh1dvGn994woCikLEJDQniA6ohUsHdCVlX2yjemJ43Ujskob')
+        cy.setCookie('sessionid', 'zf4o9xkownkqpvunmecwf789el6war7d')
+
+        cy.request({
+            method: 'POST',
+            url: `/comments/add/${pathSplit[2]}/`,
+            body: {
+                "content": "comment created via API"
+            },
+            form: true,
+            headers: {
+                'X-CSRFToken': 'Zpe3934sqarqMFa1fh1dvGn994woCikLEJDQniA6ohUsHdCVlX2yjemJ43Ujskob',
+                'Content-Type': "multipart/form-data; boundary=--------------------------579482458443764609045166"
+            }
+        })
+
+        cy.reload()
+
+    })
+})
 
 // TODO Create a command for user creation
