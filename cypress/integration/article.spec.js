@@ -55,7 +55,7 @@ describe('Article actions',()=> {
         })
     })
 
-    it.only('should be able to edit an article', ()=> {
+    it('should be able to edit an article', ()=> {
         // This test allows to edit an article via API, access and check its elements
 
         // TODO consider moving the edit method to a function
