@@ -38,8 +38,12 @@ describe('Comment actions', () => {
     it('should be able to edit a comment', () => {
         // Manual test to edit a comment created via API
 
+        // Intercept and wait are used to wait to load the textarea for editing
+        cy.intercept('GET', '/comments/edit/**').as('getComment')
         cy.addComment()
         cy.get('.ion-edit').click()
+        cy.wait('@getComment', {timeout:6000})
+
         cy.get('textarea').eq(1).clear()
         cy.get('textarea').eq(1).type('Edited comment')
         cy.contains('Save Comment').click()

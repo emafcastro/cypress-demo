@@ -55,7 +55,7 @@ describe('Article actions',()=> {
         })
     })
 
-    it('should be able to edit an article', ()=> {
+    it.only('should be able to edit an article', ()=> {
         // This test allows to edit an article via API, access and check its elements
 
         // TODO consider moving the edit method to a function
@@ -65,24 +65,10 @@ describe('Article actions',()=> {
         const body = "Edited body"
         const tags = "test"
 
-        cy.setCookie('csrftoken', 'Zpe3934sqarqMFa1fh1dvGn994woCikLEJDQniA6ohUsHdCVlX2yjemJ43Ujskob')
-        cy.setCookie('sessionid', 'zf4o9xkownkqpvunmecwf789el6war7d')
+        cy.addArticle()
+        cy.visit('/')
 
-        cy.request({
-            method: 'POST',
-            url: '/article/edit/21/',
-            body: {
-                "title": title,
-                "summary": description,
-                "content": body,
-                "tags": tags
-            },
-            form: true,
-            headers: {
-                'X-CSRFToken': 'Zpe3934sqarqMFa1fh1dvGn994woCikLEJDQniA6ohUsHdCVlX2yjemJ43Ujskob',
-                'Content-Type': "multipart/form-data; boundary=--------------------------579482458443764609045166"
-            }
-        }).then((response) => {
+        cy.editArticle(title, description, body, tags).then((response) => {
             cy.visit(response.headers['hx-redirect'])
 
             // Validations to verify the changes were made
@@ -94,8 +80,6 @@ describe('Article actions',()=> {
             cy.contains(description).should('be.visible')
             cy.contains(body).should('be.visible')
         })
-
-
     })
 
     it('should be able to like an article with another user', () => {
@@ -110,6 +94,8 @@ describe('Article actions',()=> {
             cy.loginWithCredentials("like@test.com", "Test1234")
             cy.contains('Sign Out').should('be.visible')
 
+
+            
             // Visit the url to the created article
             cy.visit(response.headers['hx-redirect'])
 
@@ -119,6 +105,6 @@ describe('Article actions',()=> {
 
         })
 
-    })  
+    })
     
 })

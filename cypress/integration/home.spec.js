@@ -13,7 +13,12 @@ describe('Logged users actions', () => {
 
 
     it('should be able to see my feed', () => {
+
+        //Wait until own articles finish loading
+        cy.intercept('GET', '/?own').as('ownArticles')
         cy.contains('Your Feed').click()
+        cy.wait('@ownArticles', {timeout: 6000})
+
         cy.get('.author').each(($el) => {
             cy.wrap($el).should('have.text','automation')
         })
@@ -24,7 +29,7 @@ describe('Logged users actions', () => {
         // This test allows to create a new article and then like with another user
 
         cy.addArticle()
-        // Cookies and storage is deleted, then the log in is performed with the user like
+        // Cookies and storage are deleted, then the log in is performed with the user like
         cy.clearCookies()
         cy.clearLocalStorage()
         cy.visit('/login')
@@ -74,9 +79,15 @@ describe('Logged users actions', () => {
 
 
     it('should be able to filter by tag', () => {
-        cy.addArticle("newTag")
+        // This test creates a new article with a different tag, then there is a verification to check the filter by tag
+        cy.addArticle({tags:"newTag"})
         cy.visit('/')
+
+        // Wait until the page loads the specific articles for the tag
+        cy.intercept('GET','/?tag=newTag').as('getTag')
         cy.get('.sidebar').contains('newTag').click()
+        cy.wait('@getTag', {timeout: 6000})
+
         cy.get('.tag-outline').each(($elem)=>{
             cy.wrap($elem).should('have.text','newTag')
         })
