@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "cypress": "cypress open",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dashboard": "cypress run --record --key fb298235-fee1-4687-a134-df8cde536bb6"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
