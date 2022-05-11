@@ -1,0 +1,14 @@
+{
+  "users": [
+    {
+      "username": "automation",
+      "email": "automation@test.com",
+      "password": "Test1234"
+    },
+    {
+      "username": "like",
+      "email": "like@test.com",
+      "password": "Test1234"
+    }
+  ]
+}

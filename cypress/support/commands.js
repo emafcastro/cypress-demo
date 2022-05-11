@@ -1,34 +1,36 @@
-// ***********************************************
-// This example commands.js shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+import { maketoken } from "./utils"
 
-// TODO This command will be used with an API method
 Cypress.Commands.add('loginWithCredentials', (email, password)=> {
     cy.get('#id_username').type(email)
     cy.get('#id_password').type(password)
     cy.get('button.btn').click()
+})
+
+
+Cypress.Commands.add('loginWithAPI', (email,password) => {
+    const csrftoken = maketoken(64)
+
+
+    cy.setCookie('csrftoken', csrftoken)
+
+    cy.request({
+        method: 'POST',
+        url: '/login/',
+        body: {
+            "username": email,
+            "password": password,
+            "csrfmiddlewaretoken": csrftoken
+        },
+        form: true,
+        headers: {
+            'Content-Type': "application/x-www-form-urlencoded; charset=UTF-8"
+        }
+    }).should((response) => {
+        cy.log('Check if the user is correctly logged in')
+        expect(response.status).to.eq(200)
+    })
+
+    cy.visit('/')
 })
 
 
@@ -61,7 +63,7 @@ Cypress.Commands.add('deleteArticle', () => {
 })
 
 Cypress.Commands.add('addArticle', ({title, description, body, tags} = {}) => {
-    // TODO Investigate about adding an article with more than one tag
+
     if (title == undefined) {
         title = "New Article " + Date.now()
     }
@@ -110,9 +112,8 @@ Cypress.Commands.add('addArticle', ({title, description, body, tags} = {}) => {
 
 
 Cypress.Commands.add('editArticle', (title, description, body, tags) => {
-    // TODO Investigate about adding an article with more than one tag
 
-    // Check if this is necessary for local
+    // TODO Check if all setCookie methods are necessary for local
     //cy.setCookie('csrftoken', 'Zpe3934sqarqMFa1fh1dvGn994woCikLEJDQniA6ohUsHdCVlX2yjemJ43Ujskob')
     //cy.setCookie('sessionid', 'zf4o9xkownkqpvunmecwf789el6war7d')
 

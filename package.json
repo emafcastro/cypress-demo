@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "cypress": "cypress open",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "cy:run": "cypress run",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "cy:open:local": "cypress open --config-file local-config.json",
+    "cy:run:local": "cypress run --config-file local-config.json"
   },
   "keywords": [],
   "author": "",

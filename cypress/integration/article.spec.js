@@ -5,10 +5,7 @@ describe('Article actions',()=> {
     beforeEach(() => {
 
         // The user will be logged in before each test
-        cy.visit('/login')
-        cy.loginWithCredentials("automation@test.com", "Test1234")
-        cy.contains('Sign Out').should('be.visible')
-        
+        cy.loginWithAPI("automation@test.com", "Test1234")
     })
 
     it('should be able to create a new Article', () =>{
@@ -58,8 +55,6 @@ describe('Article actions',()=> {
     it('should be able to edit an article', ()=> {
         // This test allows to edit an article via API, access and check its elements
 
-        // TODO consider moving the edit method to a function
-        // TODO Create first an article and then edit it
         const title = "Edited title via Cypress"
         const description = "Edited description"
         const body = "Edited body"
@@ -90,12 +85,8 @@ describe('Article actions',()=> {
             // Cookies and storage is deleted, then the log in is performed with the user like
             cy.clearCookies()
             cy.clearLocalStorage()
-            cy.visit('/login')
-            cy.loginWithCredentials("like@test.com", "Test1234")
-            cy.contains('Sign Out').should('be.visible')
+            cy.loginWithAPI("like@test.com", "Test1234")
 
-
-            
             // Visit the url to the created article
             cy.visit(response.headers['hx-redirect'])
 

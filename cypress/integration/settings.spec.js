@@ -5,9 +5,7 @@ describe('Settings actions', () => {
     beforeEach(() => {
 
         // The user will be logged in before each test
-        cy.visit('/login')
-        cy.loginWithCredentials("automation@test.com", "Test1234")
-        cy.contains('Sign Out').should('be.visible')
+        cy.loginWithAPI("automation@test.com", "Test1234")
         
     })
 
@@ -53,9 +51,8 @@ describe('Settings actions', () => {
         cy.clearCookies()
         cy.clearLocalStorage()
 
-        cy.visit('/login')
-        cy.loginWithCredentials(newMail, "Test1234")
-        cy.contains('Sign Out').should('be.visible')
+        cy.loginWithAPI(newMail, "Test1234")
+        
         cy.contains('Settings').click()
         cy.get('#id_email').invoke('attr', 'value').should('eq', newMail)
         
@@ -74,9 +71,8 @@ describe('Settings actions', () => {
         cy.clearCookies()
         cy.clearLocalStorage()
 
-        cy.visit('/login')
         cy.get('@email').then((email) => {
-            cy.loginWithCredentials(email, "Test5678")
+            cy.loginWithAPI(email, "Test5678")
         })
         cy.contains('Sign Out').should('be.visible')
     })

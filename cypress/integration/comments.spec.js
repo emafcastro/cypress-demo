@@ -5,9 +5,7 @@ describe('Comment actions', () => {
     beforeEach(() => {
 
         // The user will be logged in before each test
-        cy.visit('/login')
-        cy.loginWithCredentials("automation@test.com", "Test1234")
-        cy.contains('Sign Out').should('be.visible')
+        cy.loginWithAPI("automation@test.com", "Test1234")
 
         // A new article will be created to work with each comment test
         cy.addArticle().as('createdArticle').then((response) => {

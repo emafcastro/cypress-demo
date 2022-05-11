@@ -5,9 +5,7 @@ describe('Logged users actions', () => {
     beforeEach(() => {
 
         // The user will be logged in before each test
-        cy.visit('/login')
-        cy.loginWithCredentials("automation@test.com", "Test1234")
-        cy.contains('Sign Out').should('be.visible')
+        cy.loginWithAPI("automation@test.com", "Test1234")
         
     })
 
@@ -32,9 +30,7 @@ describe('Logged users actions', () => {
         // Cookies and storage are deleted, then the log in is performed with the user like
         cy.clearCookies()
         cy.clearLocalStorage()
-        cy.visit('/login')
-        cy.loginWithCredentials("like@test.com", "Test1234")
-        cy.contains('Sign Out').should('be.visible')
+        cy.loginWithAPI("like@test.com", "Test1234")
 
         // Intercept the POST request after clicking like to wait until it is finished
         cy.intercept('POST','/article/favorite/**').as('favoriteArticle')
