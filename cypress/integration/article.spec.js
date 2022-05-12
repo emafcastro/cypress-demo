@@ -3,9 +3,14 @@
 describe('Article actions',()=> {
 
     beforeEach(() => {
-
         // The user will be logged in before each test
-        cy.loginWithAPI("automation@test.com", "Test1234")
+        
+        // The log in will be done with the first user in user.json file 
+        cy.fixture('user.json').as('users').then((data)=>{
+            cy.loginWithAPI(data.users[0].email, data.users[0].password)
+            cy.visit('/')
+        })
+        
     })
 
     it('should be able to create a new Article', () =>{
@@ -27,7 +32,7 @@ describe('Article actions',()=> {
     })
 
     it('should logged out user be able to see the article', () => {
-        // This test creates an article via API, gets url, then clearStorage and cookies, then verify elements and try to comment
+        // This test creates an article via API, gets its url, then clearStorage and cookies, finally verify elements and try to comment
         cy.addArticle().then((response) => {
             cy.clearCookies()
             cy.clearLocalStorage()
@@ -40,6 +45,7 @@ describe('Article actions',()=> {
                 cy.wrap($el).should('be.visible')
             })
 
+            // The date will be verified to be today's date
             const today = new Date();
             const date = today.toLocaleString('default', { year: 'numeric', month: 'long', day: 'numeric' })
             cy.get('.date').each(($el) => {
@@ -80,12 +86,15 @@ describe('Article actions',()=> {
     it('should be able to like an article with another user', () => {
         // This test allows to login with another user and like an article
 
-        // A new article with user automation is created
         cy.addArticle().then((response) => {
-            // Cookies and storage is deleted, then the log in is performed with the user like
+            // Cookies and storage are deleted, then the log in is performed with the second user
             cy.clearCookies()
             cy.clearLocalStorage()
-            cy.loginWithAPI("like@test.com", "Test1234")
+
+            // The second user is taken from the fixture user.json
+            cy.get('@users').then((data)=>{
+                cy.loginWithAPI(data.users[1].email, data.users[1].password)
+            })
 
             // Visit the url to the created article
             cy.visit(response.headers['hx-redirect'])

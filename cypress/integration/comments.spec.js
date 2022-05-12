@@ -5,7 +5,9 @@ describe('Comment actions', () => {
     beforeEach(() => {
 
         // The user will be logged in before each test
-        cy.loginWithAPI("automation@test.com", "Test1234")
+        cy.fixture('user.json').then((data)=>{
+            cy.loginWithAPI(data.users[0].email, data.users[0].password)
+        })
 
         // A new article will be created to work with each comment test
         cy.addArticle().as('createdArticle').then((response) => {
@@ -36,7 +38,7 @@ describe('Comment actions', () => {
     it('should be able to edit a comment', () => {
         // Manual test to edit a comment created via API
 
-        // Intercept and wait are used to wait to load the textarea for editing
+        // Intercept and wait are used to wait for the textarea to be enable for edition
         cy.intercept('GET', '/comments/edit/**').as('getComment')
         cy.addComment()
         cy.get('.ion-edit').click()

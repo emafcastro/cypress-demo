@@ -1,6 +1,7 @@
 import { maketoken } from "./utils"
 
 Cypress.Commands.add('loginWithCredentials', (email, password)=> {
+    // Manual log in
     cy.get('#id_username').type(email)
     cy.get('#id_password').type(password)
     cy.get('button.btn').click()
@@ -8,6 +9,7 @@ Cypress.Commands.add('loginWithCredentials', (email, password)=> {
 
 
 Cypress.Commands.add('loginWithAPI', (email,password) => {
+    // Log in via API
     const csrftoken = maketoken(64)
 
 
@@ -25,22 +27,14 @@ Cypress.Commands.add('loginWithAPI', (email,password) => {
         headers: {
             'Content-Type': "application/x-www-form-urlencoded; charset=UTF-8"
         }
-    }).should((response) => {
-        cy.log('Check if the user is correctly logged in')
-        expect(response.status).to.eq(200)
     })
 
-    cy.visit('/')
 })
 
 
 
 Cypress.Commands.add('deleteArticle', () => {
-    // Delete article option does not exist on the webist, so this method is executed via request
-    // The only way I found to delete an article is by setting two cookies before executing the method
-
-    //cy.setCookie('csrftoken', 'Zpe3934sqarqMFa1fh1dvGn994woCikLEJDQniA6ohUsHdCVlX2yjemJ43Ujskob')
-    //cy.setCookie('sessionid', 'zf4o9xkownkqpvunmecwf789el6war7d')
+    // Delete article via API
     
     cy.getCookie('csrftoken').then((cookie) => {
 
@@ -64,25 +58,26 @@ Cypress.Commands.add('deleteArticle', () => {
 
 Cypress.Commands.add('addArticle', ({title, description, body, tags} = {}) => {
 
-    if (title == undefined) {
-        title = "New Article " + Date.now()
-    }
+    // Add article via API
 
-    if (description == undefined){
-        description = "This is an article created by API"
-    }
-
-    if (body == undefined) {
-        body = "# Hello World"
-    }
-
-    if (tags == undefined) {
-        tags = "test"
-    }
-
-    // Check if this is necessary for local
-    //cy.setCookie('csrftoken', 'Zpe3934sqarqMFa1fh1dvGn994woCikLEJDQniA6ohUsHdCVlX2yjemJ43Ujskob')
-    //cy.setCookie('sessionid', 'zf4o9xkownkqpvunmecwf789el6war7d')
+    cy.fixture('article.json').then((article) => {
+        if (title == undefined) {
+            title = article.title + Date.now()
+        }
+    
+        if (description == undefined){
+            description = article.summary
+        }
+    
+        if (body == undefined) {
+            body = article.content
+        }
+    
+        if (tags == undefined) {
+            tags = article.tags
+        }
+    })
+    
 
     cy.getCookie('csrftoken').then((cookie) => {
         cy.request({
@@ -99,12 +94,6 @@ Cypress.Commands.add('addArticle', ({title, description, body, tags} = {}) => {
             headers: {
                 'Content-Type': "application/x-www-form-urlencoded; charset=UTF-8"
             }
-    
-            //Header for Local
-            // headers: {
-            //     'X-CSRFToken': 'Zpe3934sqarqMFa1fh1dvGn994woCikLEJDQniA6ohUsHdCVlX2yjemJ43Ujskob',
-            //     'Content-Type': "multipart/form-data; boundary=--------------------------579482458443764609045166"
-            // }
         })
     })
     
@@ -113,11 +102,7 @@ Cypress.Commands.add('addArticle', ({title, description, body, tags} = {}) => {
 
 Cypress.Commands.add('editArticle', (title, description, body, tags) => {
 
-    // TODO Check if all setCookie methods are necessary for local
-    //cy.setCookie('csrftoken', 'Zpe3934sqarqMFa1fh1dvGn994woCikLEJDQniA6ohUsHdCVlX2yjemJ43Ujskob')
-    //cy.setCookie('sessionid', 'zf4o9xkownkqpvunmecwf789el6war7d')
-
-
+    // Edit article via API
 
     cy.getCookie('csrftoken').then((cookie) => {
 
@@ -153,10 +138,6 @@ Cypress.Commands.add('addComment', ()=> {
     cy.get('@createdArticle').then((response) => {
         const pathSplit = response.headers['hx-redirect'].split("/")
         
-        // Check if this is necessary for local
-        // cy.setCookie('csrftoken', 'Zpe3934sqarqMFa1fh1dvGn994woCikLEJDQniA6ohUsHdCVlX2yjemJ43Ujskob')
-        // cy.setCookie('sessionid', 'zf4o9xkownkqpvunmecwf789el6war7d')
-
         cy.getCookie('csrftoken').then((cookie) => {
             cy.request({
                 method: 'POST',
@@ -170,11 +151,6 @@ Cypress.Commands.add('addComment', ()=> {
                     'Content-Type': "application/x-www-form-urlencoded; charset=UTF-8"
                 }
 
-                // Values for local
-                // headers: {
-                //     'X-CSRFToken': 'Zpe3934sqarqMFa1fh1dvGn994woCikLEJDQniA6ohUsHdCVlX2yjemJ43Ujskob',
-                //     'Content-Type': "multipart/form-data; boundary=--------------------------579482458443764609045166"
-                // }
             })
         })
 
@@ -184,22 +160,38 @@ Cypress.Commands.add('addComment', ()=> {
 })
 
 
-Cypress.Commands.add('createUser', ()=>{
-    cy.setCookie('csrftoken', 'Zpe3934sqarqMFa1fh1dvGn994woCikLEJDQniA6ohUsHdCVlX2yjemJ43Ujskob')
-    cy.setCookie('sessionid', 'zf4o9xkownkqpvunmecwf789el6war7d')
+Cypress.Commands.add('createUser', ({email, name, password}= {})=>{
+
+    //Create user via API
+    const csrftoken = maketoken(64)
+
+    cy.setCookie('csrftoken', csrftoken)
+
+
+    if (email == undefined){
+        email = `automated${Date.now()}@test.com`
+    }
+
+    if (name == undefined){
+        name = `automated${Date.now()}`
+    }
+
+    if (password == undefined){
+        password = "Test1234"
+    }
 
     cy.request({
         method: 'POST',
         url: '/register/',
         body: {
-            "email": `automated${Date.now()}@test.com`,
-            "name": `automated${Date.now()}`,
-            "password": "Test1234"
+            "email": email,
+            "name": name,
+            "password": password
         },
         form: true,
         headers: {
-            'X-CSRFToken': 'Zpe3934sqarqMFa1fh1dvGn994woCikLEJDQniA6ohUsHdCVlX2yjemJ43Ujskob',
-            'Content-Type': "multipart/form-data; boundary=--------------------------579482458443764609045166"
+            'X-CSRFToken': csrftoken,
+            'Content-Type': "application/x-www-form-urlencoded; charset=UTF-8"
         }
     })
 })
