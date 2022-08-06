@@ -1,10 +1,12 @@
-import { maketoken } from "./utils"
+import { maketoken } from "./utils";
+import SignInPage from "../support/pageobjects/SignInPage";
 
 Cypress.Commands.add('loginWithCredentials', (email, password)=> {
     // Manual log in
-    cy.get('#id_username').type(email)
-    cy.get('#id_password').type(password)
-    cy.get('button.btn').click()
+    const signInPage = new SignInPage();
+    signInPage.getUsernameField().type(email)
+    signInPage.getPasswordField().type(password)
+    signInPage.getSignInButton().click()
 })
 
 
