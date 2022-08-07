@@ -6,5 +6,13 @@ class NavBarPage{
     getSignOutLink(){
         return this.getNavLinks().contains('Sign Out')
     }
+
+    getNewArticleLink(){
+        return this.getNavLinks().contains('New Article')
+    }
+
+    getSettingsLink(){
+        return this.getNavLinks().contains('Settings')
+    }
 }
 export default NavBarPage

@@ -35,7 +35,7 @@ describe('Login actions', () => {
 
         beforeEach(() => cy.visit("/login"))
 
-        it.only('should logging with correct credentials', () => {
+        it('should logging with correct credentials', () => {
             // This test validates the user can log in correctly
             const navBarPage = new NavBarPage();
 

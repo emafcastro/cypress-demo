@@ -1,6 +1,12 @@
 /// <reference types="cypress" />
+import ArticleFormPage from "../support/pageobjects/ArticleFormPage";
+import HomePage from "../support/pageobjects/HomePage";
+import NavBarPage from "../support/pageobjects/NavBarPage";
+import ArticleDetailPage from "../support/pageobjects/ArticleDetailPage"
 
 describe('Article actions',()=> {
+    const articleFormPage = new ArticleFormPage();
+    const articleDetailPage = new ArticleDetailPage();
 
     beforeEach(() => {
         // The user will be logged in before each test
@@ -13,22 +19,31 @@ describe('Article actions',()=> {
         
     })
 
+    afterEach(()=>{
+        cy.visit('/')
+        cy.deleteArticle()
+    })
+
     it('should be able to create a new Article', () =>{
         // The first time an End to End test is used
-
+        
         const title = "New Article " + Date.now()
         const description = "This is an automated article"
         const body = "# Hello World"
         const tags = "test"
 
-        cy.contains('New Article').click()
-        cy.get('#id_title').type(title)
-        cy.get('#id_summary').type(description)
-        cy.get('#id_content').type(body)
-        cy.get('[name=tags]').type(tags)
-        cy.contains('Publish Article').click()
+        const navBarPage = new NavBarPage();
+        navBarPage.getNewArticleLink().click()
+        
+        articleFormPage.getTitleField().type(title)
+        articleFormPage.getSummaryField().type(description)
+        articleFormPage.getContentField().type(body)
+        articleFormPage.getTagField().type(tags)
+        articleFormPage.getPublishButton().click()
         cy.visit('/')
-        cy.get('a > h1').eq(0).should('have.text', title)
+
+        const homePage = new HomePage();
+        homePage.getLastCreatedArticle().should('have.text', title)
     })
 
     it('should logged out user be able to see the article', () => {
@@ -40,21 +55,22 @@ describe('Article actions',()=> {
             cy.visit(response.headers['hx-redirect']) // This header returns the path to the created article
 
             // All elements will be verified to be visible
-            cy.get('.container > h1').should('be.visible')
-            cy.get('.author').each(($el) => {
+            articleDetailPage.getArticleTitleText().should('be.visible')
+            articleDetailPage.getArticleAuthorLinks().each(($el) => {
                 cy.wrap($el).should('be.visible')
             })
 
             // The date will be verified to be today's date
             const today = new Date();
-            const date = today.toLocaleString('default', { year: 'numeric', month: 'long', day: 'numeric' })
-            cy.get('.date').each(($el) => {
-                cy.wrap($el).should('have.text', date)
+            let date = today.toLocaleString('default', { year: 'numeric', month: 'short', day: 'numeric' })
+            let convertedDate = [date.slice(0, 3), ".", date.slice(3)].join('')
+            articleDetailPage.getArticleDates().each(($el) => {
+                cy.wrap($el).should('have.text', convertedDate)
             })
 
-            cy.get('.article-content').should('be.visible')
+            articleDetailPage.getArticleContent().should('be.visible')
 
-            cy.get('textarea').should('not.exist')
+            articleDetailPage.getCommentTextArea().should('not.exist')
         })
     })
 
@@ -73,8 +89,8 @@ describe('Article actions',()=> {
             cy.visit(response.headers['hx-redirect'])
 
             // Validations to verify the changes were made
-            cy.contains(title).should('be.visible')
-            cy.get('.author').each(($el) => {
+            articleDetailPage.getArticleTitleText().should('be.visible')
+            articleDetailPage.getArticleAuthorLinks().each(($el) => {
                 cy.wrap($el).should('contain.text', 'automation')
             })
 
@@ -83,7 +99,8 @@ describe('Article actions',()=> {
         })
     })
 
-    it('should be able to like an article with another user', () => {
+    it.skip('should be able to like an article with another user', () => {
+        // SKIPPED until figure out how to login again with the previous user
         // This test allows to login with another user and like an article
 
         cy.addArticle().then((response) => {
@@ -100,8 +117,8 @@ describe('Article actions',()=> {
             cy.visit(response.headers['hx-redirect'])
 
             // Click on favorite post and check again that it has the class btn-outline-secondary
-            cy.contains('Favorite Post').click()
-            cy.contains('Favorite Post').should('have.class', 'btn-outline-secondary')
+            articleDetailPage.getFavoritePostButton().click()
+            articleDetailPage.getFavoritePostButton().should('have.class', 'btn-outline-secondary')
 
         })
 

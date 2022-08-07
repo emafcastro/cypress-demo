@@ -1,6 +1,9 @@
 /// <reference types="cypress" />
+import HomePage from "../support/pageobjects/HomePage"
 
 describe('Logged users actions', () => {
+
+    const homePage = new HomePage();
 
     beforeEach(() => {
 
@@ -18,13 +21,13 @@ describe('Logged users actions', () => {
 
         // Wait until own articles finish loading
         cy.intercept('GET', '/?own').as('ownArticles')
-        cy.contains('Your Feed').click()
+        homePage.getYourFeedLink().click()
         cy.wait('@ownArticles', {timeout: 6000})
 
 
         // Then check every author contains the name of the first user
         cy.get('@users').then((data) => {
-            cy.get('.author').each(($el) => {
+            homePage.getAuthorLinks().each(($el) => {
                 cy.wrap($el).should('have.text', data.users[0].name)
             })
         })
@@ -50,11 +53,11 @@ describe('Logged users actions', () => {
         cy.intercept('POST','/article/favorite/**').as('favoriteArticle')
 
         // Press like button on created article and check again that it has the class btn-outline-secondary
-        cy.get('.article-meta button').eq(0).click()
+        homePage.getFirstArticleLikeButton().click()
         cy.wait('@favoriteArticle', { timeout: 10000 } )
-        cy.get('.article-meta button').eq(0).should('have.class', 'btn-outline-secondary')
+        homePage.getFirstArticleLikeButton().should('have.class', 'btn-outline-secondary')
 
-        cy.get('.article-meta button').eq(0).then((item) => {
+        homePage.getFirstArticleLikeButton().then((item) => {
             cy.wrap(item).should('contain.text', '1')
         })
         
@@ -70,12 +73,12 @@ describe('Logged users actions', () => {
 
 
         // The length of the list will be obtained
-        cy.get('.article-preview').its('length').then((oldLength) => {
+        homePage.getAllArticles().its('length').then((oldLength) => {
             // Then the first article will be deleted
             cy.deleteArticle()
 
             // Then a new length needs to be obtained
-            cy.get('.article-preview').its('length').then((actualLength)=>{
+            homePage.getAllArticles().its('length').then((actualLength)=>{
 
                 expect(actualLength).to.be.below(oldLength)
 
@@ -92,19 +95,19 @@ describe('Logged users actions', () => {
 
     it('should be able to filter by tag', () => {
         // This test creates a new article with a different tag, then there is a verification to check the filter by tag
+
+        const tag = "newTag"
         
-        cy.addArticle({tags:"newTag"})
+        cy.addArticle({tags:`${tag}`})
         cy.visit('/')
 
         // Wait until the page loads the specific articles for the tag
         cy.intercept('GET','/?tag=newTag').as('getTag')
-        cy.get('.sidebar').contains('newTag').click()
+        homePage.getPopularTags().contains('newTag').click()
         cy.wait('@getTag', {timeout: 6000})
 
         // Some articles contains more than one tag, so we iterate over each one and check if at least exist the created tag
-        cy.get('.article-preview').each(($article) => {
-            cy.wrap($article).find('li').contains('newTag').should('exist')
-        })
+        homePage.verifyAllDisplayedArticlesContainsTag(tag)
     })
 
 })
