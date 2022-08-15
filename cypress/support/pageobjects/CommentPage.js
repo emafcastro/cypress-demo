@@ -1,26 +1,50 @@
-class CommentPage{
-    getCommentTextArea(){
-        return cy.get('textarea')
-    }
-    
-    getPostButton(){
-        return cy.contains('Post Comment')
+/// <reference types="cypress" />
+class CommentPage {
+    locators = {
+        commentTextArea: "textarea",
+        postButton: "Post Comment",
+        deleteCommentButton: ".mod-options .ion-trash-a",
+        editCommentButton: ".mod-options .ion-edit",
+        saveCommentButton: "Save Comment",
+    };
+
+    getLastPostedComment() {
+        return cy.get(this.locators.commentTextArea).eq(1);
     }
 
-    getDeleteCommentButton(){
-        return cy.get('.mod-options .ion-trash-a')
+    typeComment(comment){
+        cy.get(this.locators.commentTextArea).type(comment);
     }
 
-    getEditCommentButton(){
-        return cy.get('.mod-options .ion-edit')
+    clickPostButton(){
+        cy.contains(this.locators.postButton).click();
     }
 
-    getLastPostedComment(){
-        return this.getCommentTextArea().eq(1)
+    clickDeleteCommentButton(){
+        cy.get(this.locators.deleteCommentButton).click();
     }
 
-    getSaveCommentButton(){
-        return cy.contains('Save Comment')
+    verifyVisibilityOfComment(comment){
+        cy.contains(comment).should("be.visible");
     }
+
+    verifyConfirmationMessage(){
+        cy.on("window:confirm", (text) => {
+            expect(text).to.contains("Delete this comment?");
+        });
+    }
+
+    clickEditCommentButton(){
+        cy.get(this.locators.editCommentButton).click();
+    }
+
+    typeLastPostedComment(comment){
+        this.getLastPostedComment().clear().type(comment);
+    }
+
+    clickSaveCommentButton(){
+        cy.contains(this.locators.saveCommentButton).click();
+    }
+
 }
-export default CommentPage
+export const commentPage = new CommentPage();

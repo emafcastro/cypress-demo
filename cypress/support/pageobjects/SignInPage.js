@@ -1,18 +1,38 @@
+/// <reference types="cypress" />
 class SignInPage {
-    getUsernameField(){
-        return cy.get('#id_username')
+    locators = {
+        usernameField: "#id_username",
+        passwordField: "#id_password",
+        errorMessageSection: ".error-messages",
+        signInButton: "button.btn",
+    };
+
+    loginWithCredentials(email, password){
+        cy.get(this.locators.usernameField).type(email)
+        cy.get(this.locators.passwordField).type(password)
+        cy.get(this.locators.signInButton).click()
     }
 
-    getPasswordField(){
-        return cy.get('#id_password')
+    loginWithFirstUserFromFixture(){
+        cy.fixture("user.json").then((data) => {
+            // The request to the home needs to be intercepted in order to wait until home page is loaded
+            cy.intercept("GET", "/").as("getHome");
+            this.loginWithCredentials(data.users[0].email, data.users[0].password);
+            cy.wait("@getHome", { timeout: 6000 });
+        });
     }
 
-    getErrorMessageSection(){
-        return cy.get('.error-messages')
+    // VERIFICATIONS
+    verifyUsernameFieldIsRequired() {
+        cy.get(this.locators.usernameField).should("have.attr", "required");
     }
 
-    getSignInButton(){
-        return cy.get('button.btn')
+    verifyPasswordFieldIsRequired(){
+        cy.get(this.locators.passwordField).should("have.attr", "required");
+    }
+
+    verifyErrorMessageContainsText(text){
+        cy.get(this.locators.errorMessageSection).should("contain.text", text);
     }
 }
-export default SignInPage
+export const signInPage = new SignInPage();

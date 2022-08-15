@@ -1,26 +1,46 @@
-class SettingsPage{
-    getImageField(){
-        return cy.get('#id_image')
+/// <reference types="cypress" />
+class SettingsPage {
+    locators = {
+        imageField: "#id_image",
+        updateButton: "Update Settings",
+        nameField: "#id_name",
+        bioField: "#id_bio",
+        emailField: "#id_email",
+        passwordField: "#id_password",
+    };
+
+    typeInImageField(text) {
+        cy.get(this.locators.imageField).clear().type(text);
     }
 
-    getUpdateButton(){
-        return cy.contains('Update Settings')
+    clickUpdateButton() {
+        cy.contains(this.locators.updateButton).click();
     }
 
-    getNameField(){
-        return cy.get('#id_name')
+    typeInNameField(text) {
+        cy.get(this.locators.nameField).clear().type(text);
     }
 
-    getBioField(){
-        return cy.get('#id_bio')
+    typeInBioField(text){
+        cy.get(this.locators.bioField).clear().type(text);
     }
 
-    getEmailField(){
-        return cy.get('#id_email')
+    typeInEmailField(text){
+        cy.get(this.locators.emailField).clear().type(text);
     }
 
-    getPasswordField(){
-        return cy.get('#id_password')
+    typeInPasswordField(text){
+        cy.get(this.locators.passwordField).clear().type(text);
+    }
+
+    getEmailFieldValue(){
+        return cy.get(this.locators.emailField).invoke("attr", "value")
+    }
+
+    // VERIFICATIONS
+
+    verifyEmailFieldHasText(text){
+        cy.get(this.locators.emailField).invoke("attr", "value").should("eq", text);
     }
 }
-export default SettingsPage
+export const settingsPage = new SettingsPage();

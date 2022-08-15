@@ -1,22 +1,29 @@
+/// <reference types="cypress" />
 class ArticleFormPage {
-    getTitleField(){
-        return cy.get('#id_title')
+    locators = {
+        titleField: "#id_title",
+        summaryField: "#id_summary",
+        contentField: "#id_content",
+        tagField: "[name=tags]",
+        publishButton: "Publish Article",
+    };
+
+    createNewArticleWithFixture() {
+        cy.fixture("article.json").then((data) => {
+            cy.get(this.locators.titleField).type(data.title);
+            cy.get(this.locators.summaryField).type(data.summary);
+            cy.get(this.locators.contentField).type(data.content);
+            cy.get(this.locators.tagField).type(data.tags);
+        });
+        cy.contains(this.locators.publishButton).click();
     }
 
-    getSummaryField(){
-        return cy.get('#id_summary')
-    }
-
-    getContentField(){
-        return cy.get('#id_content')
-    }
-
-    getTagField(){
-        return cy.get('[name=tags]')
-    }
-
-    getPublishButton(){
-        return cy.contains('Publish Article')
+    createNewArticle(title, summary, content, tags) {
+        cy.get(this.locators.titleField).type(title);
+        cy.get(this.locators.summaryField).type(summary);
+        cy.get(this.locators.contentField).type(content);
+        cy.get(this.locators.tagField).type(tags);
+        cy.contains(this.locators.publishButton).click();
     }
 }
-export default ArticleFormPage
+export const articleFormPage = new ArticleFormPage();

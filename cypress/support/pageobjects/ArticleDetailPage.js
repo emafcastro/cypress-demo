@@ -1,26 +1,58 @@
-class ArticleDetailPage{
-    getArticleTitleText(){
-        return cy.get('.container > h1')
+/// <reference types="cypress" />
+class ArticleDetailPage {
+    locators = {
+        articleTitleText: ".container > h1",
+        articleAuthorLinks: ".author",
+        articleDatesText: ".date",
+        articleContentSection: ".article-content",
+        articleCommentTextArea: "textarea",
+        favoritePostButton: "Favorite Post",
+    };
+
+    clickFavoriteButton(){
+        cy.get(this.locators.favoritePostButton).click();
     }
 
-    getArticleAuthorLinks(){
-        return cy.get('.author')
+    verifyVisibilityOfTitle() {
+        cy.get(this.locators.articleTitleText).should("be.visible");
     }
 
-    getArticleDates(){
-        return cy.get('.date')
+    verifyVisibilityOfAuthor() {
+        cy.get(this.locators.articleAuthorLinks).each(($el) => {
+            cy.wrap($el).should("be.visible");
+        });
     }
 
-    getArticleContent(){
-        return cy.get('.article-content')
+    verifyDatesAreToday() {
+        const today = new Date();
+        let date = today.toLocaleString("default", { year: "numeric", month: "short", day: "numeric" });
+        let convertedDate = [date.slice(0, 3), ".", date.slice(3)].join("");
+
+        cy.get(this.locators.articleDatesText).each(($el) => {
+            cy.wrap($el).should("have.text", convertedDate);
+        });
     }
 
-    getCommentTextArea(){
-        return cy.get('textarea')
+    verifyVisibilityOfContent(){
+        cy.get(this.locators.articleContentSection).should("be.visible");
     }
 
-    getFavoritePostButton(){
-        return cy.contains('Favorite Post')
+    verifiyInvisibilityOfTextArea(){
+        cy.get(this.locators.articleCommentTextArea).should("not.exist");
+    }
+
+    verifyAuthorLinksContainsText(text){
+        cy.get(this.locators.articleAuthorLinks).each(($el) => {
+            cy.wrap($el).should("contain.text", text);
+        });
+    }
+
+    verifyVisibilityOfText(text){
+        cy.contains(text).should("be.visible");
+    }
+
+    verifyFavoriteButtonChangeStyle(){
+        cy.get(this.locators.favoritePostButton).should("have.class", "btn-outline-secondary");
     }
 }
-export default ArticleDetailPage
+export const articleDetailPage = new ArticleDetailPage();

@@ -1,18 +1,29 @@
+/// <reference types="cypress" />
 class NavBarPage{
-    getNavLinks(){
-        return cy.get('nav ul > li > a')
+
+    locators = {
+        navLinks: 'nav ul > li > a',
+        signOutLink: 'Sign Out',
+        newArticleLink: 'New Article',
+        settingsLink: 'Settings'
+    }
+    
+    clickNewArticleLink(){
+        cy.get(this.locators.navLinks).contains(this.locators.newArticleLink).click();
     }
 
-    getSignOutLink(){
-        return this.getNavLinks().contains('Sign Out')
+    clickSignOutLink(){
+        cy.get(this.locators.navLinks).contains(this.locators.signOutLink).click();
     }
 
-    getNewArticleLink(){
-        return this.getNavLinks().contains('New Article')
+    clickSettingsLink(){
+        cy.get(this.locators.navLinks).contains(this.locators.settingsLink).click();
     }
 
-    getSettingsLink(){
-        return this.getNavLinks().contains('Settings')
+    // VERIFICATIONS
+
+    verifySignOutLinkIsVisible(){
+        cy.get(this.locators.navLinks).contains(this.locators.signOutLink).should("be.visible");
     }
 }
-export default NavBarPage
+export const navBarPage = new NavBarPage()
