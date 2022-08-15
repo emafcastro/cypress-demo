@@ -1,8 +1,8 @@
 /// <reference types="cypress" />
 import { commentPage } from "../support/pageobjects/CommentPage";
-import { accountAPI } from "../support/api/accountAPI";
-import { articleAPI } from "../support/api/articleAPI";
-import { commentAPI } from "../support/api/commentAPI";
+import { accountAPI } from "../support/api/AccountAPI";
+import { articleAPI } from "../support/api/ArticleAPI";
+import { commentAPI } from "../support/api/CommentAPI";
 
 describe("Comment actions", () => {
     beforeEach(() => {

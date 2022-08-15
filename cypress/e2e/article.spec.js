@@ -3,8 +3,8 @@ import { articleFormPage } from "../support/pageobjects/ArticleFormPage";
 import { homePage } from "../support/pageobjects/HomePage";
 import { navBarPage } from "../support/pageobjects/NavBarPage";
 import { articleDetailPage } from "../support/pageobjects/ArticleDetailPage";
-import { accountAPI } from "../support/api/accountAPI";
-import { articleAPI } from "../support/api/articleAPI";
+import { accountAPI } from "../support/api/AccountAPI";
+import { articleAPI } from "../support/api/ArticleAPI";
 
 describe("Article actions", () => {
     beforeEach(() => {

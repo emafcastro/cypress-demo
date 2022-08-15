@@ -2,7 +2,7 @@
 import { settingsPage } from "../support/pageobjects/SettingsPage";
 import { profilePage } from "../support/pageobjects/ProfilePage";
 import { navBarPage } from "../support/pageobjects/NavBarPage";
-import { accountAPI } from "../support/api/accountAPI";
+import { accountAPI } from "../support/api/AccountAPI";
 
 describe("Settings actions", () => {
     beforeEach(() => {

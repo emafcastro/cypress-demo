@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 import { homePage } from "../support/pageobjects/HomePage";
-import { accountAPI } from "../support/api/accountAPI";
-import { articleAPI } from "../support/api/articleAPI";
+import { accountAPI } from "../support/api/AccountAPI";
+import { articleAPI } from "../support/api/ArticleAPI";
 
 describe("Logged users actions", () => {
     beforeEach(() => {
