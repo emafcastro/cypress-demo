@@ -1,5 +1,4 @@
 /// <reference types="cypress" />
-import { maketoken } from "../utils";
 import BaseAPI from "./BaseAPI";
 
 class AccountAPI extends BaseAPI {
@@ -47,6 +46,19 @@ class AccountAPI extends BaseAPI {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
             },
+        });
+    }
+
+    signInAPIWithFirstUserFromFixture(){
+        cy.clearCookies();
+        cy.fixture("user.json").then((data) => {
+            this.signInUserWithAPI(data.users[0].email, data.users[0].password);
+        });
+    }
+
+    signInAPIWithSecondUserFromFixture(){
+        cy.fixture("user.json").then((data) => {
+            this.signInUserWithAPI(data.users[1].email, data.users[1].password);
         });
     }
 }

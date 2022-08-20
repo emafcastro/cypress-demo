@@ -45,7 +45,7 @@ class HomePage {
     }
 
     verifyAuthorShouldBeFirstUser() {
-        cy.get("@users").then((data) => {
+        cy.fixture("user.json").then((data) => {
             cy.get(this.locators.authorLinks).each(($el) => {
                 cy.wrap($el).should("have.text", data.users[0].name);
             });

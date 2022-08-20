@@ -6,12 +6,8 @@ import { articleAPI } from "../support/api/ArticleAPI";
 describe("Logged users actions", () => {
     beforeEach(() => {
         // The user will be logged in before each test
-        cy.fixture("user.json")
-            .as("users")
-            .then((data) => {
-                accountAPI.signInUserWithAPI(data.users[0].email, data.users[0].password);
-                cy.visit("/");
-            });
+        accountAPI.signInAPIWithFirstUserFromFixture();
+        cy.visit("/");
     });
 
     it("should be able to see my feed", () => {
@@ -35,10 +31,9 @@ describe("Logged users actions", () => {
         cy.clearCookies();
         cy.clearLocalStorage();
 
-        cy.get("@users").then((data) => {
-            accountAPI.signInUserWithAPI(data.users[1].email, data.users[1].password);
-            cy.visit("/");
-        });
+        accountAPI.signInAPIWithSecondUserFromFixture();
+        cy.visit("/");
+        
 
         // Intercept the POST request after clicking like to wait until the process is finished
         cy.intercept("POST", "/article/favorite/**").as("favoriteArticle");

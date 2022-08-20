@@ -10,5 +10,6 @@ module.exports = defineConfig({
     },
     baseUrl: 'https://realworld-djangoapp.herokuapp.com/',
     specPattern: 'cypress/e2e/**/*.{js,jsx,ts,tsx}',
+    supportFile: 'cypress/support/e2e.js',
   },
 })

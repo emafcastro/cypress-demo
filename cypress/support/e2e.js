@@ -1,5 +1,5 @@
 import "./commands";
-import { accountAPI } from "../support/api/accountAPI";
+import { accountAPI } from "../support/api/AccountAPI";
 const jsdom = require("jsdom");
 
 before("Check if the users exist in the database", () => {

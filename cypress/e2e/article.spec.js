@@ -11,12 +11,8 @@ describe("Article actions", () => {
         // The user will be logged in before each test
 
         // The log in will be done with the first user in user.json file
-        cy.fixture("user.json")
-            .as("users")
-            .then((data) => {
-                accountAPI.signInUserWithAPI(data.users[0].email, data.users[0].password);
-                cy.visit("/");
-            });
+        accountAPI.signInAPIWithFirstUserFromFixture();
+        cy.visit('/');
     });
 
     afterEach(() => {
@@ -40,7 +36,7 @@ describe("Article actions", () => {
         homePage.verifyLastCreatedArticleHasTitle(title);
     });
 
-    it("should logged out user be able to see the article", () => {
+    it.only("should logged out user be able to see the article", () => {
         // This test creates an article via API, gets its url, then clearStorage and cookies, finally verify elements and try to comment
         articleAPI.addArticleWithAPI().then((response) => {
             cy.clearCookies();
@@ -93,9 +89,7 @@ describe("Article actions", () => {
             cy.clearLocalStorage();
 
             // The second user is taken from the fixture user.json
-            cy.get("@users").then((data) => {
-                accountAPI.signInUserWithAPI(data.users[1].email, data.users[1].password);
-            });
+            accountAPI.signInAPIWithSecondUserFromFixture();
 
             // Visit the url to the created article
             cy.visit(response.headers["hx-redirect"]);

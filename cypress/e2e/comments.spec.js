@@ -7,9 +7,7 @@ import { commentAPI } from "../support/api/CommentAPI";
 describe("Comment actions", () => {
     beforeEach(() => {
         // The user will be logged in before each test
-        cy.fixture("user.json").then((data) => {
-            accountAPI.signInUserWithAPI(data.users[0].email, data.users[0].password);
-        });
+        accountAPI.signInAPIWithFirstUserFromFixture();
 
         // A new article will be created to work with each comment test
         articleAPI.addArticleWithAPI()
